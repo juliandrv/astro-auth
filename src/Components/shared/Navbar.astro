@@ -7,13 +7,13 @@
         <a href="/">Inicio</a>
       </li>
       <li class="font-semibold text-gray-700">
-        <a href="/protected">Protegido</a>
-      </li>
-      <li class="font-semibold text-gray-700">
         <a href="/login">Ingresar</a>
       </li>
       <li class="font-semibold text-gray-700">
-        <a href="#">Salir</a>
+        <a href="/protected">Perfil Protegido</a>
+      </li>
+      <li id="logout" class="font-semibold text-gray-700">
+        <a href="#">Cerrar Sesión</a>
       </li>
       <li>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -30,3 +30,13 @@
     </ul>
   </div>
 </nav>
+
+<script>
+import { actions } from "astro:actions"
+
+  const $logout = document.querySelector('#logout') as HTMLElement
+  $logout?.addEventListener('click', async () => {
+    await actions.logout()
+    window.location.href = '/'
+  })
+</script>

@@ -66,7 +66,8 @@ const rememberMe = !!email
 
 
 <script>
-import { actions } from "astro:actions"
+  import { actions } from "astro:actions"
+  import Swal from 'sweetalert2'
 
   const $form = document.querySelector('form') as HTMLFormElement
   const $submitBtn = $form.querySelector('#btn-submit') as HTMLButtonElement
@@ -78,8 +79,17 @@ import { actions } from "astro:actions"
     const formData = new FormData($form)
 
     const {data, error} = await actions.registerUser(formData)
-    if(error) console.log(error.message)
 
-    $submitBtn.removeAttribute('disabled')
+    if (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Datos incorrectos',
+        text: error.message
+      })
+      $submitBtn.removeAttribute('disabled')
+      return
+    }
+
+    window.location.replace('/protected')
   })
 </script>

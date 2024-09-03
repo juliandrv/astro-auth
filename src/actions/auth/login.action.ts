@@ -1,24 +1,20 @@
+import { firebase } from '@/firebase/config';
 import { defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
-
 import {
-  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   type AuthError,
 } from 'firebase/auth';
-import { firebase } from '@/firebase/config';
 
-export const registerUser = defineAction({
+export const loginUser = defineAction({
   accept: 'form',
   input: z.object({
-    name: z.string().min(2),
     email: z.string().email(),
     password: z.string().min(6),
     remember_me: z.boolean().optional(),
   }),
-  handler: async (
-    { name, email, password, remember_me },
-    { cookies }
-  ) => {
+
+  handler: async ({ email, password, remember_me }, { cookies }) => {
     // Cookies
     if (remember_me) {
       cookies.set('email', email, {
@@ -31,23 +27,19 @@ export const registerUser = defineAction({
       });
     }
 
-    // Creación de usuario en Firebase Auth
     try {
-      const user = await createUserWithEmailAndPassword(
+      const user = await signInWithEmailAndPassword(
         firebase.auth,
         email,
         password
       );
-      // Actualizar el nombre del usuario
-
-      // Verificar el correo electrónico
-
       return JSON.stringify(user);
     } catch (error) {
       const firebaseError = error as AuthError;
-      if (firebaseError.code === 'auth/email-already-in-use') {
-        throw new Error('El correo ya está en uso');
+      if (firebaseError.code === 'auth/invalid-credential') {
+        throw new Error('El correo o la contraseña no son válidos');
       }
+      console.log(error);
       throw new Error('Algo salió mal');
     }
   },
