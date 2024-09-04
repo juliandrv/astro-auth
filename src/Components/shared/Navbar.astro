@@ -1,4 +1,7 @@
-<!-- component -->
+---
+const { isLoggedIn }= Astro.locals
+---
+
 <nav class="flex justify-between px-20 py-10 items-center bg-white">
   <h1 class="text-xl text-gray-800 font-bold">Astro Auth</h1>
   <div class="flex items-center">
@@ -6,15 +9,18 @@
       <li class="font-semibold text-gray-700">
         <a href="/">Inicio</a>
       </li>
-      <li class="font-semibold text-gray-700">
-        <a href="/login">Ingresar</a>
-      </li>
-      <li class="font-semibold text-gray-700">
-        <a href="/protected">Perfil Protegido</a>
-      </li>
-      <li id="logout" class="font-semibold text-gray-700">
-        <a href="#">Cerrar Sesión</a>
-      </li>
+      {!isLoggedIn ? (
+        <li class="font-semibold text-gray-700">
+          <a href="/login">Ingresar</a>
+        </li>
+      ) : (
+        <li class="font-semibold text-gray-700">
+          <a href="/protected">Perfil Protegido</a>
+        </li>
+        <li id="logout" class="font-semibold text-gray-700">
+          <a href="#">Cerrar Sesión</a>
+        </li>
+      )}
       <li>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path d="M12 14l9-5-9-5-9 5 9 5z" />
@@ -32,7 +38,7 @@
 </nav>
 
 <script>
-import { actions } from "astro:actions"
+  import { actions } from "astro:actions"
 
   const $logout = document.querySelector('#logout') as HTMLElement
   $logout?.addEventListener('click', async () => {

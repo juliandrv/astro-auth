@@ -47,6 +47,14 @@ const rememberMe = !!email
           <button id="btn-submit" type="submit" class="disabled:bg-gray-300 w-full flex justify-center bg-green-400  hover:bg-green-500 text-gray-100 p-3  rounded-full tracking-wide font-semibold  shadow-lg cursor-pointer transition ease-in duration-500">
             Ingresar
           </button>
+
+          <div class="flex flex-1 w-full my-3">
+            <div class="w-full border-t-2 border-gray-500">
+              <button id="btn-google" type="button" class="disabled:bg-gray-300 my-3 w-full flex justify-center bg-red-400  hover:bg-red-500 text-gray-100 p-3  rounded-full tracking-wide font-semibold  shadow-lg cursor-pointer transition ease-in duration-500">
+                Ingresar con Google
+              </button>
+            </div>
+          </div>
         </div>
       </form>
 
@@ -60,11 +68,14 @@ const rememberMe = !!email
 </AuthLayout>
 
 <script>
+import { firebase } from "@/firebase/config"
 import { actions } from "astro:actions"
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 import Swal from "sweetalert2"
 
   const $form = document.querySelector('form') as HTMLFormElement
-  const $btnSubmit = $form?.querySelector('#btn-submit') as HTMLButtonElement
+  const $btnSubmit = $form.querySelector('#btn-submit') as HTMLButtonElement
+  const $btnGoogle = $form.querySelector('#btn-google') as HTMLButtonElement
 
   $form.addEventListener('submit', async (e) => {
     e.preventDefault()
@@ -84,6 +95,35 @@ import Swal from "sweetalert2"
     }
 
     window.location.replace('/protected')
+  })
 
+  $btnGoogle.addEventListener('click', async () => {
+    $btnGoogle.setAttribute('disabled', 'disabled')
+
+    const provider = new GoogleAuthProvider()
+
+    try {
+      // Paso 1: obtener credenciales del lado del cliente
+      const credentials = await signInWithPopup(firebase.auth, provider)
+
+      // Paso 2: verificar las credenciales en el backend
+      const { error } = await actions.loginWithGoogle(credentials)
+      if (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al ingresar con Google',
+        text: error.message
+      })
+      $btnGoogle.removeAttribute('disabled')
+      return
+    }
+
+    $btnGoogle.innerText = 'Ingresando...'
+    window.location.replace('/protected')
+
+    } catch (error) {
+      console.log(error)
+      $btnGoogle.removeAttribute('disabled')
+    }
   })
 </script>

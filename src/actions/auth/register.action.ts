@@ -3,6 +3,8 @@ import { z } from 'astro:schema';
 
 import {
   createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
   type AuthError,
 } from 'firebase/auth';
 import { firebase } from '@/firebase/config';
@@ -38,9 +40,18 @@ export const registerUser = defineAction({
         email,
         password
       );
-      // Actualizar el nombre del usuario
+
+      // Actualizar el nombre del usuario (displayName)
+      updateProfile(firebase.auth.currentUser!, {
+        displayName: name,
+      });
 
       // Verificar el correo electrónico
+      await sendEmailVerification(firebase.auth.currentUser!, {
+        url: `${
+          import.meta.env.WEBSITE_URL
+        }/protected?emailVerified=true`,
+      });
 
       return JSON.stringify(user);
     } catch (error) {

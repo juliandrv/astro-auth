@@ -1,15 +1,25 @@
 ---
-import {firebase} from '@/firebase/config'
-import MainLayout from "@/layouts/MainLayout.astro";
 import { Image } from 'astro:assets';
+// import {firebase} from '@/firebase/config'
+import MainLayout from "@/layouts/MainLayout.astro";
 
-const firebaseUser = firebase.auth.currentUser
+const { user, isLoggedIn } = Astro.locals
 
-if (firebaseUser === null) {
+if (!isLoggedIn || !user) {
   return Astro.redirect('/login')
 }
-const { displayName, email, emailVerified, photoURL } = firebaseUser
-const name = displayName ?? 'Sin nombre'
+
+const { avatar, email, emailVerified, name} = user
+
+// const firebaseUser = firebase.auth.currentUser
+
+// if (firebaseUser === null) {
+//   return Astro.redirect('/login')
+// }
+
+// await firebaseUser?.reload()
+// const { displayName, email, emailVerified, photoURL } = firebaseUser
+// const name = displayName ?? 'Sin nombre'
 ---
 
 <MainLayout>
@@ -17,8 +27,8 @@ const name = displayName ?? 'Sin nombre'
 <div class="bg-gray-200 rounded-xl font-sans h-[600px] w-full flex flex-row justify-center items-center">
   <div class="card w-96 mx-auto bg-white rounded shadow-xl hover:shadow">
     {
-      photoURL ? (
-        <Image  src={photoURL} alt={`Avatar de ${name}`} inferSize class="w-32 mx-auto rounded-full -mt-20 border-8 border-white" />
+      avatar ? (
+        <Image  src={avatar} alt={`Avatar de ${name}`} inferSize class="w-32 mx-auto rounded-full -mt-20 border-8 border-white" />
       ) : (
         <div class="w-32 h-32 mx-auto rounded-full -mt-20 border-8 border-white bg-gray-300 flex justify-center items-center">
           <span class="text-white text-3xl font-extrabold">
